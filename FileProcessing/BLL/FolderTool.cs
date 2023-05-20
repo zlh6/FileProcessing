@@ -22,7 +22,7 @@ namespace FileProcessing.DAL
             string[] subdirectories = Directory.GetDirectories(path,"*", SearchOption.AllDirectories);
             foreach (string subdir in subdirectories)
             {
-                if (Directory.GetFileSystemEntries(subdir).Length < 1)
+                if (Directory.GetFiles(subdir,"*",SearchOption.AllDirectories).Length < 1)
                 {
                     emptyFolders.Add(subdir);
                 }

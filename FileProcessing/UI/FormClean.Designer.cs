@@ -34,9 +34,14 @@
             this.button浏览 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.checkedListBox清理列表 = new System.Windows.Forms.CheckedListBox();
-            this.button执行 = new System.Windows.Forms.Button();
+            this.button扫描 = new System.Windows.Forms.Button();
             this.checkBox全选 = new System.Windows.Forms.CheckBox();
             this.button反选 = new System.Windows.Forms.Button();
+            this.button一键清理 = new System.Windows.Forms.Button();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBox目标目录
@@ -73,21 +78,25 @@
             // checkedListBox清理列表
             // 
             this.checkedListBox清理列表.CheckOnClick = true;
+            this.checkedListBox清理列表.ColumnWidth = 440;
             this.checkedListBox清理列表.FormattingEnabled = true;
             this.checkedListBox清理列表.Location = new System.Drawing.Point(50, 152);
+            this.checkedListBox清理列表.MultiColumn = true;
             this.checkedListBox清理列表.Name = "checkedListBox清理列表";
-            this.checkedListBox清理列表.Size = new System.Drawing.Size(1165, 484);
+            this.checkedListBox清理列表.Size = new System.Drawing.Size(1166, 484);
             this.checkedListBox清理列表.TabIndex = 4;
             // 
-            // button执行
+            // button扫描
             // 
-            this.button执行.Location = new System.Drawing.Point(1125, 35);
-            this.button执行.Name = "button执行";
-            this.button执行.Size = new System.Drawing.Size(90, 45);
-            this.button执行.TabIndex = 5;
-            this.button执行.Text = "开始扫描";
-            this.button执行.UseVisualStyleBackColor = true;
-            this.button执行.Click += new System.EventHandler(this.Button执行_Click);
+            this.button扫描.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.button扫描.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button扫描.Location = new System.Drawing.Point(993, 35);
+            this.button扫描.Name = "button扫描";
+            this.button扫描.Size = new System.Drawing.Size(90, 45);
+            this.button扫描.TabIndex = 5;
+            this.button扫描.Text = "开始扫描";
+            this.button扫描.UseVisualStyleBackColor = true;
+            this.button扫描.Click += new System.EventHandler(this.Button清理_Click);
             // 
             // checkBox全选
             // 
@@ -113,15 +122,51 @@
             this.button反选.UseVisualStyleBackColor = true;
             this.button反选.Click += new System.EventHandler(this.Button反选_Click);
             // 
+            // button一键清理
+            // 
+            this.button一键清理.Location = new System.Drawing.Point(1126, 35);
+            this.button一键清理.Name = "button一键清理";
+            this.button一键清理.Size = new System.Drawing.Size(90, 45);
+            this.button一键清理.TabIndex = 8;
+            this.button一键清理.Text = "一键清理";
+            this.button一键清理.UseVisualStyleBackColor = true;
+            this.button一键清理.Click += new System.EventHandler(this.Button一键清理_Click);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1,
+            this.toolStripProgressBar1});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 647);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(1262, 26);
+            this.statusStrip1.TabIndex = 9;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(167, 20);
+            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
+            // 
+            // toolStripProgressBar1
+            // 
+            this.toolStripProgressBar1.Name = "toolStripProgressBar1";
+            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 18);
+            // 
             // FormClean
             // 
+            this.AcceptButton = this.button扫描;
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1262, 673);
+            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.button一键清理);
             this.Controls.Add(this.button反选);
             this.Controls.Add(this.checkBox全选);
-            this.Controls.Add(this.button执行);
+            this.Controls.Add(this.button扫描);
             this.Controls.Add(this.checkedListBox清理列表);
             this.Controls.Add(this.button浏览);
             this.Controls.Add(this.textBox目标目录);
@@ -132,6 +177,8 @@
             this.Text = "清理空目录";
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.公用_DragEnter);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -144,9 +191,13 @@
         private System.Windows.Forms.Button button浏览;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckedListBox checkedListBox清理列表;
-        private System.Windows.Forms.Button button执行;
+        private System.Windows.Forms.Button button扫描;
         private System.Windows.Forms.CheckBox checkBox全选;
         private System.Windows.Forms.Button button反选;
+        private System.Windows.Forms.Button button一键清理;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
     }
 }
 
