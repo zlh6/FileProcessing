@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using FileProcessing.DAL;
 
 namespace FileProcessing
 {
@@ -53,22 +52,14 @@ namespace FileProcessing
             }
         }
 
-        private void Button清理_Click(object sender, EventArgs e)
-        {
-            List<string> emptyFolders=FolderTool.GetEmptyFolder(path);
-            //checkedListBox清理列表.DataSource = emptyFolders;     //不要使用绑定
-            checkedListBox清理列表.Items.Clear();   //添加之前先将列表清空
-            foreach (string path in emptyFolders)
-            {
-                checkedListBox清理列表.Items.Add(path);
-            }
-            CheckAllItems();
-        }
 
         private void TextBox目标目录_TextChanged(object sender, EventArgs e)
         {
-            path=textBox目标目录.Text;
+            path = textBox目标目录.Text;
         }
+        /// <summary>
+        /// 默认选中列表中的所有项目
+        /// </summary>
         private void CheckAllItems()
         {
             for (int i = 0; i < checkedListBox清理列表.Items.Count; i++)
@@ -102,7 +93,34 @@ namespace FileProcessing
                 checkedListBox清理列表.SetItemChecked(i, !checkedListBox清理列表.GetItemChecked(i));
             }
         }
+        private void Button扫描_Click(object sender, EventArgs e)
+        {
+            toolStripStatusLabel2.Text = "正在扫描...";
+            ThreadStart ts = new ThreadStart(GetEmptyDirectory);
+            Thread t = new Thread(ts);
+            t.Start();
+        }
+        /// <summary>
+        /// 获取所有空目录数组，填充到列表
+        /// </summary>
+        private void GetEmptyDirectory()
+        {
+            string[] subdirectories = Directory.GetDirectories(path, "*", SearchOption.AllDirectories);//所有子目录的数组
 
+            //checkedListBox清理列表.DataSource = emptyFolders;     //不要使用绑定
+            checkedListBox清理列表.Items.Clear();   //添加之前先将列表清空
+            foreach (string subdir in subdirectories)
+            {
+                if (Directory.GetFiles(subdir, "*", SearchOption.AllDirectories).Length < 1)
+                {
+                    checkedListBox清理列表.Items.Add(subdir);
+                    //Thread.Sleep(200); // 延时0.2秒
+                }
+            }
+            CheckAllItems();
+           // RefreshStatusBarLabels();
+
+        }
         private void Button一键清理_Click(object sender, EventArgs e)
         {
             ThreadStart ts = new ThreadStart(CleanEmptyDirectory);
@@ -126,5 +144,27 @@ namespace FileProcessing
                 //Thread.Sleep(200); // 延时0.2秒
             }
         }
+
+        private void CheckedListBox清理列表_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            // 获取更改后的选中状态
+            CheckState newState = e.NewValue;
+            int totalItems = checkedListBox清理列表.Items.Count; // 获取项数                                                           
+            int checkedItems = checkedListBox清理列表.CheckedItems.Count; // 获取被勾选的项数
+            if (newState == CheckState.Checked)     // 判断当前是勾选还是取消勾选项
+            {
+                // 勾选项
+                checkedItems++;
+            }
+            else if (newState == CheckState.Unchecked)
+            {
+                // 取消勾选项
+                checkedItems--;
+            }
+
+            toolStripStatusLabel1.Text = $"一共有 {totalItems} 个空目录，选中了 {checkedItems} 个空目录";
+        }
+
     }
 }
+
