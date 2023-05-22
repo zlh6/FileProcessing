@@ -95,7 +95,13 @@ namespace FileProcessing
         }
         private void Button扫描_Click(object sender, EventArgs e)
         {
-            toolStripStatusLabel2.Text = "正在扫描...";
+            if (!Directory.Exists(path))
+            {
+                MessageBox.Show("文件夹不存在！","错误",MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            CloseButton();
+            toolStripStatusLabel状态指示.Text = "正在扫描...";
             ThreadStart ts = new ThreadStart(GetEmptyDirectory);
             Thread t = new Thread(ts);
             t.Start();
@@ -106,9 +112,10 @@ namespace FileProcessing
         private void GetEmptyDirectory()
         {
             string[] subdirectories = Directory.GetDirectories(path, "*", SearchOption.AllDirectories);//所有子目录的数组
-
+            toolStripProgressBar1.Maximum = subdirectories.Length;//设定进度条最大值
             //checkedListBox清理列表.DataSource = emptyFolders;     //不要使用绑定
             checkedListBox清理列表.Items.Clear();   //添加之前先将列表清空
+            int rate = 0;   //rate代表当前进度
             foreach (string subdir in subdirectories)
             {
                 if (Directory.GetFiles(subdir, "*", SearchOption.AllDirectories).Length < 1)
@@ -116,33 +123,45 @@ namespace FileProcessing
                     checkedListBox清理列表.Items.Add(subdir);
                     //Thread.Sleep(200); // 延时0.2秒
                 }
+                rate++;
+                toolStripProgressBar1.Value = rate;
             }
             CheckAllItems();
-           // RefreshStatusBarLabels();
-
+            // RefreshStatusBarLabels();
+            toolStripStatusLabel状态指示.Text = "扫描完成";
+            OpenButton();
         }
         private void Button一键清理_Click(object sender, EventArgs e)
         {
+            CloseButton();
+            toolStripStatusLabel状态指示.Text = "正在清理...";
             ThreadStart ts = new ThreadStart(CleanEmptyDirectory);
             Thread t = new Thread(ts);
             t.Start();
+            
         }
         /// <summary>
         /// 清理空文件夹
         /// </summary>
         private void CleanEmptyDirectory()
         {
+            toolStripProgressBar1.Maximum = checkedListBox清理列表.CheckedItems.Count;
+            int rate = 0;
             for (int i = 0; i < checkedListBox清理列表.CheckedItems.Count;)
             {
                 string directoryPath = checkedListBox清理列表.CheckedItems[i].ToString();
                 if (Directory.Exists(directoryPath))
                 {
                     Directory.Delete(directoryPath, true); //删除当前项路径对应的目录
+                    rate++;
+                    toolStripProgressBar1.Value = rate;
                 }
                 checkedListBox清理列表.Items.RemoveAt(i); // 移除指定索引处的项
                 checkedListBox清理列表.Refresh(); // 刷新 CheckedListBox 界面数据
                 //Thread.Sleep(200); // 延时0.2秒
             }
+            toolStripStatusLabel状态指示.Text = "清理完成";
+            OpenButton();
         }
 
         private void CheckedListBox清理列表_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -161,10 +180,39 @@ namespace FileProcessing
                 // 取消勾选项
                 checkedItems--;
             }
-
+            if (checkedItems > 0)
+            {
+                button一键清理.Enabled = true;
+            }
+            else
+            {
+                button一键清理.Enabled = false;
+            }
             toolStripStatusLabel1.Text = $"一共有 {totalItems} 个空目录，选中了 {checkedItems} 个空目录";
         }
 
+        private void FormClean_Load(object sender, EventArgs e)
+        {
+            //允许跨线程操作UI
+            CheckForIllegalCrossThreadCalls = false;
+        }
+        /// <summary>
+        /// 关闭所有按钮
+        /// </summary>
+        private void CloseButton()
+        {
+            button扫描.Enabled = false;
+            button一键清理.Enabled = false;
+            button浏览.Enabled = false;
+            button反选.Enabled=false;
+        }
+        private void OpenButton()
+        {
+            button扫描.Enabled = true;
+            button一键清理.Enabled = true;
+            button浏览.Enabled = true;
+            button反选.Enabled = true;
+        }
     }
 }
 
