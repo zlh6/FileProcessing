@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -56,6 +57,7 @@ namespace FileProcessing
         private void TextBox目标目录_TextChanged(object sender, EventArgs e)
         {
             path = textBox目标目录.Text;
+            toolStripStatusLabel状态指示.Text = "未开始";
         }
         /// <summary>
         /// 默认选中列表中的所有项目
@@ -97,10 +99,11 @@ namespace FileProcessing
         {
             if (!Directory.Exists(path))
             {
-                MessageBox.Show("文件夹不存在！","错误",MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("文件夹不存在！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             CloseButton();
+            toolStripStatusLabel1.Text = "一共有 0 个空目录，选中了 0 个空目录";
             toolStripStatusLabel状态指示.Text = "正在扫描...";
             ThreadStart ts = new ThreadStart(GetEmptyDirectory);
             Thread t = new Thread(ts);
@@ -138,7 +141,7 @@ namespace FileProcessing
             ThreadStart ts = new ThreadStart(CleanEmptyDirectory);
             Thread t = new Thread(ts);
             t.Start();
-            
+
         }
         /// <summary>
         /// 清理空文件夹
@@ -153,6 +156,9 @@ namespace FileProcessing
                 if (Directory.Exists(directoryPath))
                 {
                     Directory.Delete(directoryPath, true); //删除当前项路径对应的目录
+                }
+                if (rate< toolStripProgressBar1.Maximum)
+                {
                     rate++;
                     toolStripProgressBar1.Value = rate;
                 }
@@ -161,6 +167,7 @@ namespace FileProcessing
                 //Thread.Sleep(200); // 延时0.2秒
             }
             toolStripStatusLabel状态指示.Text = "清理完成";
+            toolStripStatusLabel1.Text = "一共有 0 个空目录，选中了 0 个空目录";
             OpenButton();
         }
 
@@ -204,15 +211,43 @@ namespace FileProcessing
             button扫描.Enabled = false;
             button一键清理.Enabled = false;
             button浏览.Enabled = false;
-            button反选.Enabled=false;
+            button反选.Enabled = false;
         }
         private void OpenButton()
         {
             button扫描.Enabled = true;
-            button一键清理.Enabled = true;
             button浏览.Enabled = true;
             button反选.Enabled = true;
         }
+
+        private void CheckedListBox清理列表_MouseUp(object sender, MouseEventArgs e)
+        {
+            // 判断鼠标右键点击
+            if (e.Button == MouseButtons.Right)
+            {
+                // 获取鼠标点击的项索引
+                int index = checkedListBox清理列表.IndexFromPoint(e.Location);
+
+                // 判断索引是否有效
+                if (index >= 0 && index < checkedListBox清理列表.Items.Count)
+                {
+                    // 设置选中项
+                    checkedListBox清理列表.SelectedIndex = index;
+
+                    // 显示右键菜单
+                    contextMenuStrip1.Show(checkedListBox清理列表, e.Location);
+                }
+            }
+        }
+
+        private void 打开文件夹位置ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // 获取当前选中行的内容
+            string selectedItemPath = checkedListBox清理列表.SelectedItem.ToString();
+            // 使用资源管理器打开目录
+            Process.Start("explorer.exe", selectedItemPath);
+        }
+
     }
 }
 
