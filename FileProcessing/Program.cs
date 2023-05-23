@@ -16,7 +16,7 @@ namespace FileProcessing
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormClean());
+            Application.Run(new Form主窗口());
         }
     }
 }
